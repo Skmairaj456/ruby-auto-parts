@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { QrReader } from 'react-qr-reader';
+import { QrScanner } from 'react-qr-scanner';
 
 const ZxingScanner = ({ onScan }) => {
   const [facingMode, setFacingMode] = useState('environment'); // 'user' for front camera
 
-  const handleScan = (result, error) => {
-    if (!!result) {
-      onScan(result?.text);
+  const handleScan = (result) => {
+    if (result) {
+      onScan(result);
     }
+  };
 
-    if (!!error) {
-      // console.info(error);
-    }
+  const handleError = (error) => {
+    // console.info(error);
   };
 
   const toggleCamera = () => {
@@ -20,15 +20,15 @@ const ZxingScanner = ({ onScan }) => {
 
   return (
     <div className="scanner-container">
-      <QrReader
+      <QrScanner
         key={facingMode} // Add key to force re-mount on facingMode change
-        onResult={handleScan}
+        onDecode={handleScan}
+        onError={handleError}
         constraints={{
           facingMode: facingMode
         }}
-        scanDelay={300}
-        videoStyle={{ width: '100%', height: 'auto' }}
-        containerStyle={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px' }}
+        delay={300}
+        style={{ width: '100%', height: 'auto' }}
       />
       <button onClick={toggleCamera} className="btn btn-secondary mt-2">Toggle Camera</button>
       <p className="scanner-hint">Point your camera at a barcode.</p>
