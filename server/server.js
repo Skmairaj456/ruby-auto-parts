@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN || process.env.VITE_API_BASE_URL || 'http://localhost:5173',
   optionsSuccessStatus: 200
 };
 
@@ -23,7 +23,9 @@ app.use(express.json({ limit: '10mb' }));
 
 const PORT = process.env.PORT || 5001;
 
-mongoose.connect("mongodb://localhost:27017/ruby_auto_parts", { useNewUrlParser: true, useUnifiedTopology: true })
+const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/ruby_auto_parts";
+
+mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(async () => {
     console.log('MongoDB connected');
     await seed();
@@ -118,4 +120,9 @@ app.get('/test-activeitems', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+// For Vercel deployment
+if (process.env.NODE_ENV === 'production') {
+  module.exports = app;
+} else {
+  app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+}

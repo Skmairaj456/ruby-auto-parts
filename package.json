@@ -1,0 +1,30 @@
+{
+  "name": "ruby-auto-parts",
+  "version": "1.0.0",
+  "description": "Ruby Auto Parts - Inventory Management System",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "vercel-build": "cd client && npm run build",
+    "test:db": "cd server && node test-mongo-connection.js",
+    "test:login": "cd server && node test-login.js",
+    "seed:db": "cd server && node -e \"require('./utils/seed')()\"",
+    "lint": "cd client && npm run lint",
+    "lint:fix": "cd client && npm run lint -- --fix",
+    "clean": "rm -rf node_modules client/node_modules server/node_modules client/dist",
+    "clean:install": "npm run clean && npm run install:all",
+    "preview": "cd client && npm run preview",
+    "deploy": "vercel",
+    "deploy:prod": "vercel --prod"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
