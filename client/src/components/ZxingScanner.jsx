@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { QrScanner } from 'react-qr-scanner';
+import QrScanner from 'react-qr-barcode-scanner';
 
 const ZxingScanner = ({ onScan }) => {
   const [facingMode, setFacingMode] = useState('environment'); // 'user' for front camera
@@ -22,8 +22,13 @@ const ZxingScanner = ({ onScan }) => {
     <div className="scanner-container">
       <QrScanner
         key={facingMode} // Add key to force re-mount on facingMode change
-        onDecode={handleScan}
-        onError={handleError}
+        onUpdate={(err, result) => {
+          if (result) {
+            handleScan(result.getText());
+          } else if (err) {
+            handleError(err);
+          }
+        }}
         constraints={{
           facingMode: facingMode
         }}
