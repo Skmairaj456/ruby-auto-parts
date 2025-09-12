@@ -1,0 +1,45 @@
+# Ignore bundler config
+/.bundle
+
+# Ignore log files and temp files.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore environment files
+.env
+.env.*
+.envrc
+
+# Ignore system files
+.DS_Store
+
+# Ignore node modules (if using JS)
+/node_modules
+
+# Ignore coverage reports
+/coverage/
+
+# Ignore SQLite database files
+*.sqlite3
+*.sqlite3-journal
+
+# Ignore byebug command history file
+.byebug_history
+
+# Ignore yarn files
+yarn-error.log
+
+# Ignore master key for Rails credentials
+config/master.key
+
+# Ignore public/assets and public/packs (if using Rails asset pipeline)
+/public/assets
+/public/packs
+
+# Ignore vendor/bundle (if using deployment)
+/vendor/bundle
+
+# Ignore other editor files
+*.swp
