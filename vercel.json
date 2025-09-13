@@ -23,10 +23,12 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/client/dist/$1"
+      "dest": "/client/dist/index.html"
     }
   ],
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm run install:all"
 }
