@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import QrScanner from 'qr-scanner';
+import { BrowserMultiFormatReader } from '@zxing/browser';
 
 const ZxingScanner = ({ onScan }) => {
   const [facingMode, setFacingMode] = useState('environment'); // 'user' for front camera
   const videoRef = useRef(null);
-  const qrScannerRef = useRef(null);
+  const codeReader = useRef(null);
 
   const handleScan = (result) => {
     if (result) {
@@ -23,28 +23,31 @@ const ZxingScanner = ({ onScan }) => {
   useEffect(() => {
     if (videoRef.current) {
       // Clean up previous scanner
-      if (qrScannerRef.current) {
-        qrScannerRef.current.destroy();
+      if (codeReader.current) {
+        codeReader.current.reset();
       }
 
       // Create new scanner
-      const qrScanner = new QrScanner(
-        videoRef.current,
-        (result) => handleScan(result.data),
-        {
-          onDecodeError: (error) => handleError(error),
-          preferredCamera: facingMode,
-          highlightScanRegion: true,
-          highlightCodeOutline: true,
+      codeReader.current = new BrowserMultiFormatReader();
+      
+      const constraints = {
+        video: {
+          facingMode: facingMode
         }
-      );
+      };
 
-      qrScannerRef.current = qrScanner;
-      qrScanner.start();
+      codeReader.current.decodeFromVideoDevice(undefined, videoRef.current, (result, err) => {
+        if (result) {
+          handleScan(result.getText());
+        }
+        if (err && !(err instanceof Error)) {
+          handleError(err);
+        }
+      }, constraints);
 
       return () => {
-        if (qrScannerRef.current) {
-          qrScannerRef.current.destroy();
+        if (codeReader.current) {
+          codeReader.current.reset();
         }
       };
     }
