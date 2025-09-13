@@ -4,7 +4,13 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || process.env.VITE_API_BASE_URL || 'http://localhost:5173',
+  origin: [
+    process.env.CORS_ORIGIN,
+    'https://www.rubyautoparts.com',
+    'https://rubyautoparts.com',
+    'http://localhost:5173'
+  ].filter(Boolean),
+  credentials: true,
   optionsSuccessStatus: 200
 };
 
@@ -18,6 +24,13 @@ const adminRoutes = require('./routes/admin');
 const seed = require('./utils/seed');
 
 const app = express();
+
+// Add request logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 
@@ -41,6 +54,16 @@ app.use('/api/sales', salesRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => res.send('RAP Server running'));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
 
 // Test endpoint to check users in database
 app.get('/test-users', async (req, res) => {
