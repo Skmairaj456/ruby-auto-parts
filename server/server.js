@@ -40,10 +40,18 @@ const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/ruby_auto
 
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(async () => {
-    console.log('MongoDB connected');
-    await seed();
+    console.log('✅ MongoDB connected successfully');
+    try {
+      await seed();
+      console.log('✅ Database seeded successfully');
+    } catch (seedError) {
+      console.error('❌ Seeding error:', seedError);
+    }
   })
-  .catch(err => console.error('MongoDB connect error', err));
+  .catch(err => {
+    console.error('❌ MongoDB connect error:', err);
+    console.error('❌ Connection string:', mongoUri.replace(/\/\/.*@/, '//***:***@'));
+  });
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -57,11 +65,24 @@ app.get('/', (req, res) => res.send('RAP Server running'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  console.log('🏥 Health check requested');
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    cors_origin: process.env.CORS_ORIGIN,
+    api_base_url: process.env.VITE_API_BASE_URL
+  });
+});
+
+// Simple test endpoint
+app.get('/api/test', (req, res) => {
+  console.log('🧪 Test endpoint called');
+  res.json({
+    message: 'Server is working!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV
   });
 });
 
@@ -143,9 +164,30 @@ app.get('/test-activeitems', async (req, res) => {
   }
 });
 
-// For Vercel deployment
-if (process.env.NODE_ENV === 'production') {
-  module.exports = app;
-} else {
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('❌ Global error handler:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  console.log('❌ 404 - Route not found:', req.method, req.originalUrl);
+  res.status(404).json({
+    error: 'Route not found',
+    method: req.method,
+    url: req.originalUrl
+  });
+});
+
+// For Vercel deployment - always export the app
+module.exports = app;
+
+// Only start server in development
+if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
 }
