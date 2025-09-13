@@ -1,0 +1,9 @@
+{
+  "name": "test-server",
+  "version": "1.0.0",
+  "main": "test-server.js",
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5"
+  }
+}
