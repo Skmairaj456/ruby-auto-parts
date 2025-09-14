@@ -16,3 +16,4 @@ Open two terminals and run
 4. npm run dev
 
 Login using seeded accounts in server/.env (ADMIN1_EMAIL, ADMIN1_PASS, etc).
+# ruby-auto-parts
